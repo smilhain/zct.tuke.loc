@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin</title>
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <!-- <link rel="stylesheet" href="css/styles.css"> -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="grid-container">
+
+    <!-- Header -->
+    <header class="header">
+    <h1>Mini Meteo-station</h1>
+    </header>
+
+    <!-- Main -->
+    <main class="main-container">
+        <div class="main-title">
+            <p class="font-weight-bold" id="today-font" style="margin-top: 2px;margin-bottom: 2px;">Now:</p>
+        </div>
+
+        <div class="main-cards">
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Temperature</p>
+                    <span class="material-icons-outlined text-blue">inventory_2</span>
+                </div>
+                <span class="text-primary font-weight-bold" id="temperature-value"></span>
+            </div>
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Humidity</p>
+                    <span class="material-icons-outlined text-orange">add_shopping_cart</span>
+                </div>
+                <span class="text-primary font-weight-bold" id="humidity-value"></span>
+            </div>
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Date</p>
+                    <span class="material-icons-outlined text-green">shopping_cart</span>
+                </div>
+                <span class="text-primary font-weight-bold" id="date-value"></span>
+            </div>
+
+            <div class="card">
+                <div class="card-inner">
+                    <p class="text-primary">Слава Україні!</p>
+                    <span class="material-icons-outlined text-yellow">notification_important</span>
+                </div>
+                <span class="text-primary font-weight-bold">Putin Hujlo 🇺🇦</span>
+            </div>
+        </div>
+
+        <div class="charts" style="display: block;">
+            <div class="charts-card">
+                <p class="chart-title">Purchase and Sales Orders</p>
+                <div id="chart"></div>
+            </div>
+        </div>
+        <div class="Table-list">
+            <h1>Latest results</h1>
+            <div class="table-container"> <!-- Добавлен контейнер для адаптивности таблицы -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Temperature</th>
+                            <th>Humidity</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}°</td>
+                            <td>{{ row[2] }}%</td>
+                            <td>{{ row[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+    <!-- End Main -->
+
+</div>
+<footer class="footer">
+    <p>All rights reserved &copy; 2023</p>
+</footer>
+<!-- Scripts -->
+<!-- ApexCharts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.28.0/dist/apexcharts.min.js"></script>
+<script>
+        // Получение данных из сервера Flask
+        fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                // Разделение данных на массивы температуры, влажности и дат
+                var temperatureData = data.map(item => item.temperature);
+                var humidityData = data.map(item => item.humidity);
+                var dateData = data.map(item => item.date);
+
+                // Подготовка данных для графика
+                var chartData = {
+                    series: [
+                        { name: 'Temperature', data: temperatureData },
+                        { name: 'Humidity', data: humidityData }
+                    ],
+                    chart: {
+                        height: 350,
+                        type: 'line',
+                    },
+                    xaxis: { categories: dateData }
+                };
+
+                // Инициализация графика
+                var chart = new ApexCharts(document.querySelector("#chart"), chartData);
+
+                // Отображение графика
+                chart.render();
+            });
+    </script>
+
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
