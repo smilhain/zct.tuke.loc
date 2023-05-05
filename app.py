@@ -3,18 +3,21 @@ import mysql.connector
 from datetime import datetime
 import json
 from mysql.connector import pooling
+import pyodbc 
 
 app = Flask(__name__)
 
 # Создаем пул соединений
-db_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="my_pool",
-    pool_size=5,
-    host="zct-sql.database.windows.net",
-    user="zct_login",
-    password="!*K-AzyFaFVJm7f",
-    database="zct_tuke"
-)
+#db_pool = mysql.connector.pooling.MySQLConnectionPool(
+#    pool_name="my_pool",
+#    pool_size=5,
+#    host="zct-sql.database.windows.net",
+#    user="zct_login",
+#    password="!*K-AzyFaFVJm7f",
+#    database="zct_tuke"
+#)
+
+db_pool = cnxn = pyodbc.connect('Driver={ODBC Driver 18 for SQL Server};Server=tcp:zct-sql.database.windows.net,1433;Database=zct_tuke;Uid=zct_login;Pwd={!*K-AzyFaFVJm7f};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')
 
 @app.route('/')
 def index():
@@ -22,7 +25,7 @@ def index():
     humidity = request.args.get('humidity')
     recorded_at = datetime.now()
 
-    db_conn = db_pool.get_connection()
+    #db_conn = db_pool.get_connection()
     cursor = db_conn.cursor()
 
     cursor.execute("SELECT * FROM meteo ORDER BY date DESC")
