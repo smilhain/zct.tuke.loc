@@ -10,10 +10,10 @@ app = Flask(__name__)
 db_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="my_pool",
     pool_size=5,
-    host="viibes.mysql.tools",
-    user="viibes_zct",
-    password="#R~vDj3b77",
-    database="viibes_zct"
+    host="zct-sql.database.windows.net",
+    user="zct_login",
+    password="!*K-AzyFaFVJm7f",
+    database="zct_tuke"
 )
 
 @app.route('/')
