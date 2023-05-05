@@ -17,10 +17,22 @@ app = Flask(__name__)
 #    database="zct_tuke"
 #)
 
-db_pool = cnxn = pyodbc.connect('Driver={ODBC Driver 18 for SQL Server};Server=tcp:zct-sql.database.windows.net,1433;Database=zct_tuke;Uid=zct_login;Pwd={!*K-AzyFaFVJm7f};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')
+
+server = 'tcp:zct-sql.database.windows.net' 
+database = 'zct_tuke'
+username = 'zct_login' 
+password = '!*K-AzyFaFVJm7f'
+driver = '{ODBC Driver 17 for SQL Server}'
+
 
 @app.route('/')
 def index():
+    db_conn = pyodbc.connect('DRIVER=' + driver + 
+                      ';SERVER=' + server + 
+                      ';DATABASE=' + database + 
+                      ';UID=' + username + 
+                      ';PWD=' + password)
+
     temperature = request.args.get('temperature')
     humidity = request.args.get('humidity')
     recorded_at = datetime.now()
@@ -28,13 +40,13 @@ def index():
     #db_conn = db_pool.get_connection()
     cursor = db_conn.cursor()
 
-    cursor.execute("SELECT * FROM meteo ORDER BY date DESC")
+    cursor.execute("SELECT * FROM zct_meteo ORDER BY date DESC")
     results = cursor.fetchall()
 
 
 
     if temperature is not None and humidity is not None:
-      query = "INSERT INTO meteo (temperature, humidity, date) VALUES (%s, %s, %s)"
+      query = "INSERT INTO zct_meteo (temperature, humidity, date) VALUES (?, ?, ?)"
       cursor.execute(query, (temperature, humidity, recorded_at))
       db_conn.commit()
 
@@ -45,10 +57,14 @@ def index():
 @app.route('/data')
 def get_data():
     # Извлекаем соединение из пула
-    db_conn = db_pool.get_connection()
+    db_conn = pyodbc.connect('DRIVER=' + driver + 
+                      ';SERVER=' + server + 
+                      ';DATABASE=' + database + 
+                      ';UID=' + username + 
+                      ';PWD=' + password)
 
     cursor = db_conn.cursor()
-    cursor.execute("SELECT temperature, humidity, date FROM meteo")
+    cursor.execute("SELECT temperature, humidity, date FROM zct_meteo")
     results = cursor.fetchall()
     cursor.close()
 
@@ -67,10 +83,14 @@ def get_data():
 @app.route('/last_record')
 def last_record():
     # Извлекаем соединение из пула
-    db_conn = db_pool.get_connection()
+    db_conn = pyodbc.connect('DRIVER=' + driver + 
+                      ';SERVER=' + server + 
+                      ';DATABASE=' + database + 
+                      ';UID=' + username + 
+                      ';PWD=' + password)
 
     cursor = db_conn.cursor()
-    query = "SELECT temperature, humidity, date FROM meteo ORDER BY date DESC LIMIT 1"
+    query = "SELECT temperature, humidity, date FROM zct_meteo ORDER BY date DESC LIMIT 1"
     cursor.execute(query)
     result = cursor.fetchone()
     cursor.close()
