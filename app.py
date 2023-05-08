@@ -46,7 +46,7 @@ def index():
 
 
     if temperature is not None and humidity is not None:
-      query = "INSERT INTO meteo (temperature, humidity, date) VALUES (?, ?, ?)"
+      query = "INSERT INTO meteo (temperature, humidity, date) VALUES (%s, %s, %s)"
       cursor.execute(query, (temperature, humidity, recorded_at))
       db_conn.commit()
 
