@@ -57,11 +57,7 @@ def index():
 @app.route('/data')
 def get_data():
     # Извлекаем соединение из пула
-    db_conn = pyodbc.connect('DRIVER=' + driver + 
-                      ';SERVER=' + server + 
-                      ';DATABASE=' + database + 
-                      ';UID=' + username + 
-                      ';PWD=' + password)
+    db_conn = db_pool.get_connection()
 
     cursor = db_conn.cursor()
     cursor.execute("SELECT temperature, humidity, date FROM meteo")
@@ -83,11 +79,7 @@ def get_data():
 @app.route('/last_record')
 def last_record():
     # Извлекаем соединение из пула
-    db_conn = pyodbc.connect('DRIVER=' + driver + 
-                      ';SERVER=' + server + 
-                      ';DATABASE=' + database + 
-                      ';UID=' + username + 
-                      ';PWD=' + password)
+    db_conn = db_pool.get_connection()
 
     cursor = db_conn.cursor()
     query = "SELECT temperature, humidity, date FROM meteo ORDER BY date DESC LIMIT 1"
