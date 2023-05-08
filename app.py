@@ -8,45 +8,45 @@ import pyodbc
 app = Flask(__name__)
 
 # Создаем пул соединений
-#db_pool = mysql.connector.pooling.MySQLConnectionPool(
-#    pool_name="my_pool",
-#    pool_size=5,
-#    host="zct-sql.database.windows.net",
-#    user="zct_login",
-#    password="!*K-AzyFaFVJm7f",
-#    database="zct_tuke"
-#)
+db_pool = mysql.connector.pooling.MySQLConnectionPool(
+    pool_name="my_pool",
+    pool_size=5,
+    host="viibes.mysql.tools",
+    user="viibes_zct",
+    password="#R~vDj3b77",
+    database="viibes_zct"
+)
 
 
-server = 'tcp:zct-sql.database.windows.net' 
-database = 'zct_tuke'
-username = 'zct_login' 
-password = '!*K-AzyFaFVJm7f'
-driver = '{ODBC Driver 17 for SQL Server}'
+#server = 'tcp:zct-sql.database.windows.net' 
+#database = 'zct_tuke'
+#username = 'zct_login' 
+#password = '!*K-AzyFaFVJm7f'
+#driver = '{ODBC Driver 17 for SQL Server}'
 
 
 @app.route('/')
 def index():
-    db_conn = pyodbc.connect('DRIVER=' + driver + 
-                      ';SERVER=' + server + 
-                      ';DATABASE=' + database + 
-                      ';UID=' + username + 
-                      ';PWD=' + password)
+    #db_conn = pyodbc.connect('DRIVER=' + driver + 
+    #                  ';SERVER=' + server + 
+    #                  ';DATABASE=' + database + 
+    #                  ';UID=' + username + 
+    #                  ';PWD=' + password)
 
     temperature = request.args.get('temperature')
     humidity = request.args.get('humidity')
     recorded_at = datetime.now()
 
-    #db_conn = db_pool.get_connection()
+    db_conn = db_pool.get_connection()
     cursor = db_conn.cursor()
 
-    cursor.execute("SELECT * FROM zct_meteo ORDER BY date DESC")
+    cursor.execute("SELECT * FROM meteo ORDER BY date DESC")
     results = cursor.fetchall()
 
 
 
     if temperature is not None and humidity is not None:
-      query = "INSERT INTO zct_meteo (temperature, humidity, date) VALUES (?, ?, ?)"
+      query = "INSERT INTO meteo (temperature, humidity, date) VALUES (?, ?, ?)"
       cursor.execute(query, (temperature, humidity, recorded_at))
       db_conn.commit()
 
@@ -64,7 +64,7 @@ def get_data():
                       ';PWD=' + password)
 
     cursor = db_conn.cursor()
-    cursor.execute("SELECT temperature, humidity, date FROM zct_meteo")
+    cursor.execute("SELECT temperature, humidity, date FROM meteo")
     results = cursor.fetchall()
     cursor.close()
 
@@ -90,7 +90,7 @@ def last_record():
                       ';PWD=' + password)
 
     cursor = db_conn.cursor()
-    query = "SELECT temperature, humidity, date FROM zct_meteo ORDER BY date DESC LIMIT 1"
+    query = "SELECT temperature, humidity, date FROM meteo ORDER BY date DESC LIMIT 1"
     cursor.execute(query)
     result = cursor.fetchone()
     cursor.close()
